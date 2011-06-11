@@ -11,8 +11,9 @@
 # Simple MOTD for a shell server on FreeBSD
 #
 
-
-CURPROC=$((`ps x |wc -l |awk '{print $1}'` - 3 ));
+processes=( $(ps x -o pid) )
+#CURPROC=$((`ps x |wc -l |awk '{print $1}'` - 3 ));
+CURPROC=$(( ${#processes[@]}-3 ))
 CURQUOT=`quota -vh |grep -i "/home" |head -n 1 |awk '{print $2}'`;
 MAXQUOT=`quota -vh |grep -i "/home" |head -n 1 |awk '{print $3}'`;
 echo -e " ";
