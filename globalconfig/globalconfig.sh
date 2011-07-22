@@ -11,24 +11,20 @@
 # make config from appearing during the compile process. This allows
 # you to leave the compile process and go for a coffee ;-)
 #
-# TODO: make config for dependencies denepdencies, etc... ;z
+# TODO: make config for dependencies denepdencies, etc.
 
-echo "Fetching missing ports names, this could take a while...";
+CWD=`/bin/pwd`
+missing=`/usr/bin/make all-depends-list`
+miscnt=`echo $missing |wc -w |awl '{print $1}'`
 
-CWD=`/bin/pwd`;
-MISSING=`/usr/bin/make all-depends-list`;
-MISCNT=`echo $MISSING |wc -w |awk '{print $1}'`;
-BASEPATH="/usr/ports";
+tmp=1
 
-TMP=1;
-
-for port in $MISSING; do
-	echo -n "[ ${TMP}/${MISCNT} ] ";
-	echo -n "${port} ";
-	/usr/bin/cd ${BASEPATH}/${port};
-	/usr/bin/make config;
-	TMP=$(( TMP + 1 ));
+for port in $missing; do
+	echo -n "[ ${tmp}/${miscnt} ] "
+	echo -n "${port} "
+	cd ${port}
+	/usr/bin/make config
+	tmp=$(( tmp + 1 ))
 done
 
-/usr/bin/cd $CWD;
-echo "Done. Port is ready to compile";
+echo "Done. Port is ready to compile"
