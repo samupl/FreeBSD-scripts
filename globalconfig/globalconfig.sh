@@ -15,7 +15,7 @@
 
 CWD=`/bin/pwd`
 missing=`/usr/bin/make all-depends-list`
-miscnt=`echo $missing |wc -w |awl '{print $1}'`
+miscnt=`echo $missing |wc -w |awk '{print $1}'`
 
 tmp=1
 
