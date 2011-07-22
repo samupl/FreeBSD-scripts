@@ -10,11 +10,13 @@
 # be required by the port which you are about to compile, preventing
 # make config from appearing during the compile process. This allows
 # you to leave the compile process and go for a coffee ;-)
+#
+# TODO: make config for dependencies denepdencies, etc... ;z
 
 echo "Fetching missing ports names, this could take a while...";
 
 CWD=`/bin/pwd`;
-MISSING=`/usr/bin/make missing`;
+MISSING=`/usr/bin/make all-depends-list`;
 MISCNT=`echo $MISSING |wc -w |awk '{print $1}'`;
 BASEPATH="/usr/ports";
 
