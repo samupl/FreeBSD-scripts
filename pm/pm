@@ -115,18 +115,10 @@ case "$1" in
 		cd $basepath
 		cd $2
 		if [ "$pm_preconf" == 1 ]; then
-			missing=`/usr/bin/make all-depends-list`
-			miscnt=`echo $missing |wc -w |awk '{print $1}'`
-			tmp=1
-			for port in $missing; do
-				echo -n "[ ${tmp}/${miscnt} ] "
-				echo -n "${port} "
-				cd ${port}
-				/usr/bin/make config
-				tmp=$(( tmp + 1 ))
-			done
+            /usr/bin/make config-recursive
+        else
+            /usr/bin/make config
 		fi
-		/usr/bin/make config
 		/usr/bin/make install
 		if [ "$pm_clean" = 1 ]; then
 			/usr/bin/make clean
