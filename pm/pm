@@ -29,15 +29,16 @@
 #
 # syntax and help availble after invoking `pm -h`.
 
-pm_version=0.1
+pm_version=0.1.2
 basepath="/usr/ports"
 
 usage() {
     echo -e "usage: pm [-hv]\n"\
-            "      pm [-pc] install port\n"\
+            "      pm [-pcf] install port\n"\
             "      pm [-c] deinstall port\n"\
             "      pm [-l] rmunused\n"\
-            "      pm [-n|-k] search phrase"
+            "      pm [-n|-k] search phrase\n"\
+            "      pm update mirror\n"
 }
 
 pm_version() {
@@ -67,8 +68,9 @@ pm_help() {
 			"\nThe following commands are available:\n\n"\
 			"    install    Build and install the specified port.\n\n"\
 			"    deinstall  Remove the installed port.\n\n"\
-			"    rmunused   Remove all unused ports - mostly left dependencies.\n\n"
-			"    search     search the ports database for a phrase specified."
+			"    rmunused   Remove all unused ports - mostly left dependencies.\n"\
+			"    search     Search the ports database for a phrase specified.\n"\
+            "    update     Update the ports tree from the mirror specified."
 	echo -e \
 			"\nPM accepts following switches as it's first argument:\n\n"\
             "    -c      Clean the workdir after the compilation (or deinstallation) is\n"\
@@ -76,6 +78,11 @@ pm_help() {
             "            usage, but if you would like to recompile the port later, don't\n"\
             "            use this switch, and the compilation process would be noticeable\n"\
             "            faster.\n\n"\
+            "    -d      Do not check portaudits database for known vulnerabilities. By\n"\
+            "            default, FreeBSD will deny the installation of a port which has\n"\
+            "            known vulnerabilities.\n\n"\
+            "    -f      When installing a new port, force it's package registration. This\n"\
+            "            allows you to overwrite the port if it is already installed.\n\n"\
 	        "    -h      Displays this help document.\n\n"\
             "    -k      During the search process, the 'key' keyword will be used.\n\n"\
             "    -l      When using rmunused, do not actually remove unused dependencies,\n"\
@@ -102,12 +109,14 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-while getopts 'hvpcnkl' COMMAND_LINE_ARGUMENT ; do
+while getopts 'hfdvpcnkl' COMMAND_LINE_ARGUMENT ; do
     case "${COMMAND_LINE_ARGUMENT}" in
     h)  usage ; pm_help; exit 0 ;;
     v)  pm_ver=1 ;;
     p)  pm_preconf=1 ;;
     c)  pm_clean=1 ;;
+    d)  pm_disablevulns=1 ;;
+    f)  pm_forceregister=1 ;;
     n)  pm_s_name=1 ;;
     k)  pm_s_key=1 ;;
     l)  pm_justlist=1 ;;
@@ -128,12 +137,21 @@ case "$1" in
         else
             /usr/bin/make config
 		fi
+        
+        if [ "$pm_forceregister" == 1 ]; then
+            export FORCE_PKG_REGISTER=1;
+        fi
+        if [ "$pm_disablevulns" == 1 ]; then
+            export DISABLE_VULNERABILITIES=1;
+        fi
+        
 		/usr/bin/make install
 		if [ "$pm_clean" = 1 ]; then
 			/usr/bin/make clean
 		fi;
 		;;
 		
+        
 	deinstall)
 		if [ "$2" == "" ]; then
 			usage ; exit 1
@@ -145,6 +163,7 @@ case "$1" in
 		fi;
 		;;
 		
+        
 	rmunused)
         if [ "$pm_justlist" != 1 ];	then
             echo "Removing unused ports is not yet implemented.";
@@ -162,6 +181,15 @@ case "$1" in
 		done
 		;;
 		
+      
+    update)
+        if [ -z "$2" ]; then
+            echo "update: You must specify a mirror, ex. pm update cvsup.pl.freebsd.org"
+            exit 2
+        fi
+        /usr/local/bin/cvsup -g -P m -h $2 /usr/share/examples/cvsup/ports-supfile
+        ;;
+        
 	search)
 		if [ -z "$2" ]; then
 			usage ; exit 1
@@ -181,5 +209,6 @@ case "$1" in
 		 /"
 		;;
 		
+        
 	*) usage ; exit 1 ;;
 esac
