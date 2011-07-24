@@ -34,7 +34,7 @@ basepath="/usr/ports"
 
 usage() {
     echo -e "usage: pm [-hv]\n"\
-            "      pm [-pcf] install port\n"\
+            "      pm [-cdfp] install port\n"\
             "      pm [-c] deinstall port\n"\
             "      pm [-l] rmunused\n"\
             "      pm [-n|-k] search phrase\n"\
