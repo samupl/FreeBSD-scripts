@@ -1,3 +1,5 @@
+import struct
+
 def getpeerid(sock):
 	LOCAL_PEERCRED = 0x001
 	NGROUPS = 16
